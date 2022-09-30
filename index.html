@@ -7,18 +7,41 @@
     <title>Document</title>
 
     <style>
+      .mi-imagebox-colors {
+        max-width: 250px;
+      }
+
       .mi-imagebox-colors-single {
         display: inline-block;
         height: 50px;
         width: 50px;
+        position: relative;
       }
-      .colorInfo_1 {
+
+      .mi-popup-wrapper {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 200px;
+        background: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+        z-index: 1;
+        border-radius: 5px;
+        overflow: hidden;
+        visibility: hidden;
+        opacity: 0;
+      }
+
+      .mi-popup-wrapper.open {
+        visibility: visible;
+        opacity: 1;
+      }
+
+      .mi-popup-color {
         display: inline-block;
-        height: 100px;
-        width: 100px;
-      }
-      .mi-imagebox-colors {
-        max-width: 200px;
+        height: 50px;
+        width: 50px;
+        vertical-align: middle;
       }
     </style>
   </head>
@@ -27,44 +50,62 @@
       <div class="mi-imagebox">
         <img class="mi-imagebox-image" src="image.jpg" />
         <div class="mi-imagebox-colors"></div>
-        <div class="colorInfo_1"></div>
       </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
     <script>
       const colorThief = new ColorThief();
-      const swatches = 9;
-      const image = document.querySelector(".mi-imagebox-image");
-      const colorBoxes = document.querySelector(".mi-imagebox-colors");
-      const colorInfo = document.querySelector(".colorInfo_1");
+      const swatches = 20;
+      const elImage = document.querySelector(".mi-imagebox-image");
+      const elPopupWrapper = document.querySelector(".mi-popup-wrapper");
+      const elColorBoxes = document.querySelector(".mi-imagebox-colors");
+      var primaryColors = [];
 
-      if (image.complete) {
+      if (elImage.complete) {
         processColorActions();
       } else {
-        image.addEventListener("load", function () {
+        elImage.addEventListener("load", function () {
           processColorActions();
         });
       }
 
       function processColorActions() {
-        const colors = colorThief.getPalette(image, swatches);
-        const newColors = colors.map((rgb) => {
+        const getColors = colorThief.getPalette(elImage);
+        const colors = getColors.map((rgb) => {
           const color = `rgb(${rgb[0]},${rgb[1]}, ${rgb[2]})`;
           return color;
         }, []);
-        colorInfo.style.backgroundColor = newColors[0];
-        newColors.forEach((colorname) => {
-          const newBox = document.createElement("div");
-          newBox.classList.add("mi-imagebox-colors-single");
-          newBox.style.backgroundColor = colorname;
-          colorBoxes.appendChild(newBox);
+
+        primaryColors = colors.slice(0, 5);
+
+        primaryColors.forEach((signlecolor) => {
+          var colorBox = document.createElement("div");
+          colorBox.classList.add("mi-imagebox-colors-single");
+          colorBox.style.backgroundColor = signlecolor;
+          elColorBoxes.appendChild(colorBox);
         });
-        colorBoxes.childNodes.forEach((single) => {
-          single.addEventListener("click", function () {
-            const thisColor = this.style.backgroundColor;
-            console.log(thisColor);
-            colorInfo.style.backgroundColor = thisColor;
+
+        elColorBoxes.childNodes.forEach((singleEl, singleElIndex) => {
+          singleEl.addEventListener("click", function (e) {
+            this.children[0].classList.toggle("open");
+          });
+
+          var popupWrapper = document.createElement("div");
+          popupWrapper.classList.add("mi-popup-wrapper");
+          singleEl.appendChild(popupWrapper);
+
+          colors.forEach((single, index) => {
+            var popupColor = document.createElement("div");
+            popupColor.classList.add("mi-popup-color");
+            popupColor.style.backgroundColor = single;
+            popupWrapper.append(popupColor);
+
+            popupColor.addEventListener("click", function (event) {
+              this.parentElement.parentElement.style.backgroundColor = single;
+              primaryColors[singleElIndex] = single;
+              return primaryColors;
+            });
           });
         });
       }
