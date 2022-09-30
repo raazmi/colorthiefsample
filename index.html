@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <style>
+      .mi-imagebox-colors-single {
+        display: inline-block;
+        height: 50px;
+        width: 50px;
+      }
+      .colorInfo_1 {
+        display: inline-block;
+        height: 100px;
+        width: 100px;
+      }
+      .mi-imagebox-colors {
+        max-width: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="mi-images-wrapper">
+      <div class="mi-imagebox">
+        <img class="mi-imagebox-image" src="/image.jpg" />
+        <div class="mi-imagebox-colors"></div>
+        <div class="colorInfo_1"></div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
+    <script>
+      const colorThief = new ColorThief();
+      const swatches = 9;
+      const image = document.querySelector(".mi-imagebox-image");
+      const colorBoxes = document.querySelector(".mi-imagebox-colors");
+      const colorInfo = document.querySelector(".colorInfo_1");
+
+      image.addEventListener("load", function () {
+        // URL.revokeObjectURL(image.src);
+        const colors = colorThief.getPalette(image, swatches);
+        const newColors = colors.map((rgb) => {
+          const color = `rgb(${rgb[0]},${rgb[1]}, ${rgb[2]})`;
+          return color;
+        }, []);
+        colorInfo.style.backgroundColor = newColors[0];
+        newColors.forEach((colorname) => {
+          const newBox = document.createElement("div");
+          newBox.classList.add("mi-imagebox-colors-single");
+          newBox.style.backgroundColor = colorname;
+          colorBoxes.appendChild(newBox);
+        });
+        colorBoxes.childNodes.forEach((single) => {
+          single.addEventListener("click", function () {
+            const thisColor = this.style.backgroundColor;
+            console.log(thisColor);
+            colorInfo.style.backgroundColor = thisColor;
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
