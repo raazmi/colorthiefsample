@@ -39,8 +39,15 @@
       const colorBoxes = document.querySelector(".mi-imagebox-colors");
       const colorInfo = document.querySelector(".colorInfo_1");
 
-      image.addEventListener("load", function () {
-        // URL.revokeObjectURL(image.src);
+      if (image.complete) {
+        processColorActions();
+      } else {
+        image.addEventListener("load", function () {
+          processColorActions();
+        });
+      }
+
+      function processColorActions() {
         const colors = colorThief.getPalette(image, swatches);
         const newColors = colors.map((rgb) => {
           const color = `rgb(${rgb[0]},${rgb[1]}, ${rgb[2]})`;
@@ -60,7 +67,7 @@
             colorInfo.style.backgroundColor = thisColor;
           });
         });
-      });
+      }
     </script>
   </body>
 </html>
